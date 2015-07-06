@@ -4,7 +4,7 @@ if [ $# -eq 0 ];then #判断参数是否为nginx文件
 	echo "Error:please specify logfile."
 	exit 0
 else
-	$log=$1
+	log=$1
 fi
 
 if [ ! -f $1 ];then
@@ -21,28 +21,26 @@ echo
 ################################################
 echo "Most of the access time:"
 echo "------------------------------------------"
-awk '{print $4}' /usr/local/nginx/logs/access.log |cut -c 14-18|sort -nr|head -10
+awk '{print $4}' $log |cut -c 14-18|sort|uniq -c|sort -nr|head -10
 echo
 echo
 ###############################################
 echo "Most of the page:"
 echo "-----------------------------------------"
-awk '{print $7}' /usr/local/nginx/logs/access.log |sed 's/^.*\(.cn*\)\"/\1/g'|sort|uniq -c|sort -nr|head -10
+awk '{print $7}' $log |sed 's/^.*\(.cn*\)\"/\1/g'|sort|uniq -c|sort -nr|head -10
 echo
 echo
 ###############################################
 echo "Most of the time/Most of the ip:"
 echo "----------------------------------------"
-awk '{print $4}' /usr/local/nginx/logs/access.log |cut -c 14-18|sort -nr|head -10>time.log
+awk '{print $4}' $log |cut -c 14-18|sort|uniq -c|sort -nr|head -10 >time.log
 
 for i in `awk '{print $2}' time.log`
 do
 	num=`grep $i time.log|awk '{print $1}'`
 	echo "$i $num"
-	ip=`grep $i $log|awk '{print $1}'|sort -n|uniq -c|sort -nr|head -10`
+	ip=`grep $i $log|awk '{print $1}'|sort|uniq -c|sort -nr|head -10`
 	echo "$ip"
 	echo
 done
 rm -f time.log
-
-
